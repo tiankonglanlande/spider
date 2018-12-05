@@ -43,17 +43,22 @@ class WorkService{
             var end=linkText.indexOf("\"",start+1)
 
             var realLinkText=linkText.substring(start,end)
+            //如果保存则跳过
+            if (existLink(realLinkText)){
+                continue
+            }
+
             var article_content = getArticleContent(realLinkText);
 
             var article=Article(null,titleText,contentText,realLinkText,article_content)
             articleList.add(article)
-            articleRepository.save(article)
+            //articleRepository.save(article)
         }
 
         map.put("list",articleList)
-        //articleRepository.saveAll(articleList)
+        articleRepository.saveAll(articleList)
 
-        return map;
+        return map
     }
 
     private fun getArticleContent(url: String): String? {
@@ -61,6 +66,12 @@ class WorkService{
         val article_content = html.getElementById("article_content")
         return article_content.toString()
     }
+
+    private fun existLink(link: String): Boolean{
+        val flag=articleRepository.existsByLink(link)
+        return flag;
+    }
+
 
     private fun soup(url: String): Document {
 
